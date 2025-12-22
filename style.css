@@ -1,0 +1,271 @@
+/* style.css — JumpYT injected UI */
+
+/* ---- YouTube Control Bar Button ---- */
+#jumpyt-btn {
+  display: inline-block !important;
+  position: relative !important;
+  width: 48px !important; 
+  height: 48px !important; 
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  opacity: 0.95 !important;
+  transition: opacity 0.2s ease, transform 0.2s ease !important;
+  padding: 12px !important;
+  margin-top: 44px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  flex: none !important;
+}
+
+#jumpyt-btn:hover {
+  opacity: 1 !important;
+  transform: scale(1.1) !important;
+}
+
+#jumpyt-btn img {
+  width: 44px !important; 
+  height: 44px !important; 
+  display: block !important;
+  pointer-events: none !important;
+  filter: invert(1) !important;
+  opacity: 0.95 !important;
+  transition: opacity 0.2s ease !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+#jumpyt-btn:hover img {
+  opacity: 1 !important;
+}
+
+/* ---- Panel wrapper under video ---- */
+#jumpyt-panel {
+  margin: 8px 0 0 0;
+  font-family: Roboto, Arial, sans-serif;
+  color: var(--yt-spec-text-primary);
+}
+
+/* ---- Toggle tab ---- */
+#jumpyt-toggle {
+  user-select: none;
+  display: inline-block;
+  padding: 6px 10px;
+  border: 1px solid var(--yt-spec-10-percent-layer);
+  border-radius: 6px;
+  background: var(--yt-spec-raised-background);
+  color: var(--yt-spec-text-primary);
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+#jumpyt-toggle:hover {
+  background: var(--yt-spec-menu-background);
+}
+
+/* ---- Panel content ---- */
+#jumpyt-content {
+  margin-top: 8px;
+  padding: 10px;
+  border: 1px solid var(--yt-spec-10-percent-layer);
+  border-radius: 8px;
+  background: var(--yt-spec-raised-background);
+  color: var(--yt-spec-text-primary);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* ---- Manual add row ---- */
+#jumpyt-content #jumpyt-label,
+#jumpyt-content #jumpyt-time {
+  box-sizing: border-box;
+  height: 32px;
+  padding: 6px 8px;
+  margin-right: 6px;
+  border: 1px solid var(--yt-spec-10-percent-layer);
+  border-radius: 6px;
+  outline: none;
+  background: var(--yt-spec-base-background);
+  color: var(--yt-spec-text-primary);
+}
+
+#jumpyt-content #jumpyt-label { width: 220px; }
+#jumpyt-content #jumpyt-time { width: 140px; }
+
+#jumpyt-content #jumpyt-add {
+  height: 32px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 6px;
+  background: #cc0000; /* YouTube red */
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#jumpyt-content #jumpyt-add:hover { background: #a30000; }
+
+/* ---- Bookmark list ---- */
+#jumpyt-list {
+  list-style: none;
+  margin: 10px 0 0 0;
+  padding: 0;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+#jumpyt-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  border: 1px solid var(--yt-spec-10-percent-layer);
+  border-radius: 6px;
+  background: var(--yt-spec-menu-background);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+#jumpyt-list li:hover { 
+  background: var(--yt-spec-additive-background); 
+}
+
+/* ---- Bookmark info container ---- */
+.jumpyt-bookmark-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0; /* Allow shrinking */
+}
+
+#jumpyt-list li .jumpyt-label {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--yt-spec-text-primary);
+}
+
+#jumpyt-list li .jumpyt-time {
+  font-family: Consolas, monospace;
+  font-size: 12px;
+  color: #3ea6ff !important; /* YouTube blue for timestamps */
+  font-weight: 500;
+}
+
+/* ---- Delete button ---- */
+.jumpyt-delete-btn {
+  background: none;
+  border: none;
+  color: #cc0000;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 3px;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 1;
+  transition: background-color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.jumpyt-delete-btn:hover {
+  background: #ffebee;
+  color: #a30000;
+}
+
+/* ---- Edit button styles ---- */
+.jumpyt-edit-btn {
+  background: none;
+  border: none;
+  color: #3ea6ff;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 3px;
+  font-size: 14px;
+  line-height: 1;
+  transition: background-color 0.15s ease;
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+
+.jumpyt-edit-btn:hover {
+  background: var(--yt-spec-menu-background);
+}
+
+/* ---- Action buttons container ---- */
+.jumpyt-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* ---- Edit form styles ---- */
+.jumpyt-edit-form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+}
+
+.jumpyt-edit-form input {
+  padding: 4px 6px;
+  border: 1px solid var(--yt-spec-10-percent-layer);
+  border-radius: 4px;
+  background: var(--yt-spec-raised-background);
+  color: var(--yt-spec-text-primary);
+  font-size: 12px;
+}
+
+.jumpyt-edit-form .edit-label {
+  flex: 1;
+}
+
+.jumpyt-edit-form .edit-time {
+  width: 80px;
+}
+
+.jumpyt-edit-form button {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.jumpyt-save-btn {
+  background: #3ea6ff;
+  color: white;
+}
+
+.jumpyt-cancel-btn {
+  background: var(--yt-spec-menu-background);
+  color: var(--yt-spec-text-primary);
+}
+
+/* ---- Toast feedback ---- */
+.jumpyt-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 48px;
+  transform: translateX(-50%);
+  background: rgba(17,17,17,0.92);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  z-index: 9999;
+  animation: jumpyt-fade 1.8s ease forwards;
+}
+
+@keyframes jumpyt-fade {
+  0% { opacity: 0; transform: translateX(-50%) translateY(6px); }
+  10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  85% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-50%) translateY(6px); }
+}

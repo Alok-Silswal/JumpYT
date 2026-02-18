@@ -247,6 +247,24 @@
   color: var(--yt-spec-text-primary);
 }
 
+/* Style for the Sync Data button */
+.jumpyt-sync-btn {
+  background-color: #4CAF50;  /* Green background */
+  color: white;               /* White text */
+  padding: 10px 15px;         /* Padding */
+  margin-top: 10px;           /* Space above button */
+  border: none;               /* Remove border */
+  border-radius: 5px;         /* Rounded corners */
+  cursor: pointer;            /* Pointer cursor on hover */
+  font-size: 14px;            /* Font size */
+  text-align: center;
+}
+
+.jumpyt-sync-btn:hover {
+  background-color: #45a049;  /* Darker green on hover */
+}
+
+
 /* ---- Toast feedback ---- */
 .jumpyt-toast {
   position: fixed;

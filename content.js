@@ -101,12 +101,22 @@ function injectPanel() {
   panelContent.id = "jumpyt-content";
   panelContent.style.display = "none";
 
-  // Manual input - reordered: label first, then timestamp
+  // Manual input with improved structure
   const manualInput = document.createElement("div");
   manualInput.innerHTML = `
     <input type="text" id="jumpyt-label" placeholder="Optional label" />
-    <input type="text" id="jumpyt-time" placeholder="Timestamp(hh:mm:ss)" />
+    <input type="text" id="jumpyt-time" placeholder="Timestamp (hh:mm:ss)" />
     <button id="jumpyt-add">Add</button>
+    <input type="text" id="jumpyt-search-input" placeholder="Search bookmarks (name or time)" />
+    <button id="jumpyt-clear-search" style="display:none">Clear</button>
+    <select id="jumpyt-sort" aria-label="Sort bookmarks" title="Sort bookmarks">
+      <option value="" disabled selected hidden>Sort</option>
+      <option value="name_asc">Name ↑</option>
+      <option value="name_desc">Name ↓</option>
+      <option value="time_asc">Time ↑</option>
+      <option value="time_desc">Time ↓</option>
+    </select>
+    <button id="jumpyt-search">Search</button>
   `;
   panelContent.appendChild(manualInput);
 
@@ -144,6 +154,28 @@ function injectPanel() {
     const label = document.querySelector("#jumpyt-label").value || null;
     const timeStr = document.querySelector("#jumpyt-time").value;
     addBookmarkManually(label, timeStr);
+  });
+
+  // Search button handler
+  panelContent.querySelector("#jumpyt-search").addEventListener("click", () => {
+    const query = document.querySelector("#jumpyt-search-input").value.trim();
+    if (!query) return;
+    searchBookmarks(query);
+    panelContent.querySelector('#jumpyt-clear-search').style.display = 'inline-block';
+  });
+
+  // Clear search handler
+  panelContent.querySelector("#jumpyt-clear-search").addEventListener("click", () => {
+    document.querySelector("#jumpyt-search-input").value = '';
+    const videoId = getVideoId();
+    loadBookmarks(videoId).then((bookmarks) => renderBookmarks(bookmarks));
+    panelContent.querySelector('#jumpyt-clear-search').style.display = 'none';
+  });
+
+  // Sort handler
+  panelContent.querySelector('#jumpyt-sort').addEventListener('change', (e) => {
+    const mode = e.target.value;
+    applySort(mode);
   });
 }
 
@@ -219,63 +251,132 @@ function editBookmark(index, newLabel, newTime) {
 }
 
 // Render bookmarks in panel
-function renderBookmarks(bookmarks) {
+function renderBookmarks(bookmarks, filteredIndices) {
   const list = document.querySelector("#jumpyt-list");
   if (!list) return;
   list.innerHTML = "";
 
+  if (Array.isArray(filteredIndices) && filteredIndices.length >= 0) {
+    filteredIndices.forEach((origIndex) => {
+      const bm = bookmarks[origIndex];
+      if (!bm) return;
+      const li = document.createElement("li");
+
+      // Create bookmark info container
+      const infoContainer = document.createElement("div");
+      infoContainer.className = "jumpyt-bookmark-info";
+
+      const labelSpan = document.createElement("div");
+      labelSpan.className = "jumpyt-label";
+      labelSpan.textContent = bm.label;
+
+      const timeSpan = document.createElement("div");
+      timeSpan.className = "jumpyt-time";
+      timeSpan.textContent = formatTime(bm.time);
+
+      infoContainer.appendChild(labelSpan);
+      infoContainer.appendChild(timeSpan);
+
+      // Create actions container
+      const actionsContainer = document.createElement("div");
+      actionsContainer.className = "jumpyt-actions";
+
+      // Edit button
+      const editBtn = document.createElement("button");
+      editBtn.className = "jumpyt-edit-btn";
+      editBtn.textContent = "✏️";
+      editBtn.title = "Edit bookmark";
+
+      // Delete button
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "jumpyt-delete-btn";
+      deleteBtn.textContent = "✕";
+      deleteBtn.title = "Delete bookmark";
+
+      actionsContainer.appendChild(editBtn);
+      actionsContainer.appendChild(deleteBtn);
+
+      li.appendChild(infoContainer);
+      li.appendChild(actionsContainer);
+
+      // Click to jump to timestamp (only on info container)
+      infoContainer.addEventListener("click", () => {
+        const video = document.querySelector("video");
+        if (video) video.currentTime = bm.time;
+      });
+
+      // Edit functionality
+      editBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        showEditForm(li, origIndex, bm);
+      });
+
+      // Delete functionality
+      deleteBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (confirm(`Delete "${bm.label}"?`)) {
+          deleteBookmark(origIndex);
+        }
+      });
+
+      list.appendChild(li);
+    });
+    return;
+  }
+
+  // Default: render entire bookmarks array
   bookmarks.forEach((bm, index) => {
     const li = document.createElement("li");
-    
+
     // Create bookmark info container
     const infoContainer = document.createElement("div");
     infoContainer.className = "jumpyt-bookmark-info";
-    
+
     const labelSpan = document.createElement("div");
     labelSpan.className = "jumpyt-label";
     labelSpan.textContent = bm.label;
-    
+
     const timeSpan = document.createElement("div");
     timeSpan.className = "jumpyt-time";
     timeSpan.textContent = formatTime(bm.time);
-    
+
     infoContainer.appendChild(labelSpan);
     infoContainer.appendChild(timeSpan);
-    
+
     // Create actions container
     const actionsContainer = document.createElement("div");
     actionsContainer.className = "jumpyt-actions";
-    
+
     // Edit button
     const editBtn = document.createElement("button");
     editBtn.className = "jumpyt-edit-btn";
     editBtn.textContent = "✏️";
     editBtn.title = "Edit bookmark";
-    
+
     // Delete button
     const deleteBtn = document.createElement("button");
     deleteBtn.className = "jumpyt-delete-btn";
     deleteBtn.textContent = "✕";
     deleteBtn.title = "Delete bookmark";
-    
+
     actionsContainer.appendChild(editBtn);
     actionsContainer.appendChild(deleteBtn);
-    
+
     li.appendChild(infoContainer);
     li.appendChild(actionsContainer);
-    
+
     // Click to jump to timestamp (only on info container)
     infoContainer.addEventListener("click", () => {
       const video = document.querySelector("video");
       if (video) video.currentTime = bm.time;
     });
-    
+
     // Edit functionality
     editBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       showEditForm(li, index, bm);
     });
-    
+
     // Delete functionality
     deleteBtn.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -283,7 +384,7 @@ function renderBookmarks(bookmarks) {
         deleteBookmark(index);
       }
     });
-    
+
     list.appendChild(li);
   });
 }
@@ -377,6 +478,71 @@ function loadBookmarks(videoId) {
   });
 }
 
+// Search bookmarks by loading current list from storage and filtering by name or formatted time.
+function searchBookmarks(query) {
+  const videoId = getVideoId();
+  const q = query.toLowerCase();
+
+  const doFilter = (bookmarks) => {
+    const filteredIndices = [];
+    bookmarks.forEach((bm, idx) => {
+      const label = (bm.label || '').toLowerCase();
+      const timeStr = formatTime(bm.time).toLowerCase();
+      if (label.includes(q) || timeStr.includes(q) || String(bm.time).includes(q)) {
+        filteredIndices.push(idx);
+      }
+    });
+    renderBookmarks(bookmarks, filteredIndices);
+  };
+
+  loadBookmarks(videoId).then(doFilter);
+}
+
+// Apply sorting based on mode. If a search query is present, sort only the filtered subset.
+function applySort(mode) {
+  const videoId = getVideoId();
+  const query = (document.querySelector('#jumpyt-search-input')?.value || '').trim().toLowerCase();
+
+  loadBookmarks(videoId).then((bookmarks) => {
+    const paired = bookmarks.map((bm, idx) => ({ bm, idx }));
+
+    // If a search query exists, filter first
+    const filtered = query ? paired.filter(({ bm }) => {
+      const label = (bm.label || '').toLowerCase();
+      const timeStr = formatTime(bm.time).toLowerCase();
+      return label.includes(query) || timeStr.includes(query) || String(bm.time).includes(query);
+    }) : paired.slice();
+
+    // Sort filtered pairs
+    switch (mode) {
+      case 'name_asc':
+        filtered.sort((a, b) => (a.bm.label || '').localeCompare(b.bm.label || ''));
+        break;
+      case 'name_desc':
+        filtered.sort((a, b) => (b.bm.label || '').localeCompare(a.bm.label || ''));
+        break;
+      case 'time_asc':
+        filtered.sort((a, b) => a.bm.time - b.bm.time);
+        break;
+      case 'time_desc':
+        filtered.sort((a, b) => b.bm.time - a.bm.time);
+        break;
+      default:
+        // if no mode, render either filtered (original order) or full list
+        if (query) {
+          renderBookmarks(bookmarks, filtered.map(p => p.idx));
+          return;
+        }
+        renderBookmarks(bookmarks);
+        return;
+    }
+
+    // Render in sorted order by mapping to original indices
+    const sortedIndices = filtered.map(p => p.idx);
+    renderBookmarks(bookmarks, sortedIndices);
+  });
+}
+
 // Initialize
 function init() {
   injectControlBarButton();
@@ -389,6 +555,12 @@ function init() {
 
   // Keyboard shortcuts
   document.addEventListener("keydown", (e) => {
+    const active = document.activeElement;
+    // Don't trigger global shortcuts while the user is typing in inputs/textareas or contentEditable elements
+    if (active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA" || active.isContentEditable)) {
+      return;
+    }
+
     if (e.key === "b" || e.key === "B") {
       saveBookmarkAtCurrentTime();
     }
